@@ -23,11 +23,14 @@ function loco() {
 
   // tell ScrollTrigger to use these proxy methods for the "#main" element since Locomotive Scroll is hijacking things
   ScrollTrigger.scrollerProxy("#main", {
+    // The scrollTop method defines how to set or retrieve the scroll position using Locomotive Scroll.
     scrollTop(value) {
       return arguments.length
         ? locoScroll.scrollTo(value, 0, 0)
         : locoScroll.scroll.instance.scroll.y;
     }, // we don't have to define a scrollLeft because we're only scrolling vertically.
+
+    // The getBoundingClientRect method returns a bounding client rectangle for the scroll container.
     getBoundingClientRect() {
       return {
         top: 0,
@@ -36,55 +39,71 @@ function loco() {
         height: window.innerHeight,
       };
     },
-    // LocomotiveScroll handles things completely differently on mobile devices - it doesn't even transform the container at all! So to get the correct behavior and avoid jitters, we should pin things with position: fixed on mobile. We sense it by checking to see if there's a transform applied to the container (the LocomotiveScroll-controlled element).
+    // The pinType property determines how elements are pinned based on the existence of a transform style.
     pinType: document.querySelector("#main").style.transform
       ? "transform"
       : "fixed",
   });
 
-  // each time the window updates, we should refresh ScrollTrigger and then update LocomotiveScroll.
+  /*
+      Another event listener is added to ScrollTrigger to refresh it 
+      whenever the "refresh" event is triggered, ensuring synchronization 
+      with Locomotive Scroll.    
+  */
   ScrollTrigger.addEventListener("refresh", () => locoScroll.update());
 
   // after everything is set up, refresh() ScrollTrigger and update LocomotiveScroll because padding may have been added for pinning, etc.
   ScrollTrigger.refresh();
 }
-loco();
+loco(); //loco function is called to initiate the locomotive scroll and scrolltrigger interaction.
+
+// Initialize an empty string to store the modified HTML
 var clutter = "";
+
+// Iterate through each character of the text content within the h1 element
 document
   .querySelector("#page2>h1")
   .textContent.split("")
   .forEach(function (dets) {
+    // Wrap each character with a <span> element and append it to the clutter string
     clutter += `<span>${dets}</span>`;
 
+    // Set the inner HTML of the h1 element to the modified clutter string
     document.querySelector("#page2>h1").innerHTML = clutter;
   });
 
+// Apply GSAP animation to the spans within the h1 element using ScrollTrigger
 gsap.to("#page2>h1>span", {
   scrollTrigger: {
-    trigger: `#page2>h1>span`,
-    start: `top bottom`,
-    end: `bottom top`,
-    scroller: `#main`,
-    scrub: 0.5,
+    trigger: `#page2>h1>span`, // Trigger element for the animation
+    start: `top bottom`, // Start animation when the trigger element enters the viewport
+    end: `bottom top`, // End animation when the trigger element exits the viewport
+    scroller: `#main`, // The scroll container
+    scrub: 0.5, // Smoothing effect during scroll
   },
-  stagger: 0.2,
-  color: `#fff`,
+  stagger: 0.2, // Stagger animation delay for each span
+  color: `#fff`, // Change text color to white during animation
 });
 
 function canvas() {
+  // Get the canvas element and its 2D context
   const canvas = document.querySelector("#page3>canvas");
   const context = canvas.getContext("2d");
 
+  // Set the width and height of the canvas
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
+  // Update canvas dimensions on window resize
   window.addEventListener("resize", function () {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     render();
   });
 
+  // Function to retrieve file paths for each frame image
   function files(index) {
+    // List of image file paths separated by newline characters
     var data = `
   ./frames00007.png
   ./frames00010.png
@@ -188,15 +207,34 @@ function canvas() {
   function render() {
     scaleImage(images[imageSeq.frame], context);
   }
-
+  /*
+   The scaleImage function calculates the necessary scaling and positioning 
+   values for an image to fit within a canvas and then draws the scaled 
+   image onto the canvas. 
+   This ensures that the image maintains its aspect ratio and is 
+   centered within the canvas.
+*/
   function scaleImage(img, ctx) {
-    var canvas = ctx.canvas;
+    var canvas = ctx.canvas; //This retrieves the canvas element from the context provided.
+
+    /*
+      These calculate the horizontal and vertical ratios between the canvas 
+      size and the image size. 
+      
+  These ratios are used to determine how much the image needs to be scaled to 
+  fit within the canvas. 
+    
+    */
     var hRatio = canvas.width / img.width;
     var vRatio = canvas.height / img.height;
     var ratio = Math.max(hRatio, vRatio);
     var centerShift_x = (canvas.width - img.width * ratio) / 2;
     var centerShift_y = (canvas.height - img.height * ratio) / 2;
+    //  This clears the entire canvas, preparing it for the new frame to be drawn.
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // This draws the image on the canvas using the drawImage method.
+    // The parameters include the source image,source rectangle (full image),
+    // destination rectangle (scaled image with center shift), and scaling ratio.
     ctx.drawImage(
       img,
       0,
