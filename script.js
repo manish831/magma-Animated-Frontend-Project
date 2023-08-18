@@ -1,13 +1,24 @@
 function loco() {
+  // The GSAP (GreenSock Animation Platform) library's ScrollTrigger plugin is registered.
   gsap.registerPlugin(ScrollTrigger);
 
   // Using Locomotive Scroll from Locomotive https://github.com/locomotivemtl/locomotive-scroll
 
+  /*
+    LocomotiveScroll is initialized with options:
+        The scroll container is set to the element with the ID "main". 
+        Smooth scrolling behavior is enabled.    
+   */
   const locoScroll = new LocomotiveScroll({
     el: document.querySelector("#main"),
     smooth: true,
   });
   // each time Locomotive Scroll updates, tell ScrollTrigger to update too (sync positioning)
+
+  /*
+      An event listener is added to the Locomotive Scroll instance to update 
+      ScrollTrigger whenever the scroll position changes.  
+  */
   locoScroll.on("scroll", ScrollTrigger.update);
 
   // tell ScrollTrigger to use these proxy methods for the "#main" element since Locomotive Scroll is hijacking things
@@ -38,7 +49,7 @@ function loco() {
   ScrollTrigger.refresh();
 }
 loco();
-var clutter ="";
+var clutter = "";
 document
   .querySelector("#page2>h1")
   .textContent.split("")
@@ -59,8 +70,6 @@ gsap.to("#page2>h1>span", {
   stagger: 0.2,
   color: `#fff`,
 });
-
-
 
 function canvas() {
   const canvas = document.querySelector("#page3>canvas");
@@ -210,11 +219,6 @@ function canvas() {
 }
 canvas();
 
-
-
-
-
-
 var clutter = "";
 
 document
@@ -237,14 +241,6 @@ gsap.to("#page4>h1>span", {
   stagger: 0.2,
   color: `#fff`,
 });
-
-
-
-
-
-
-
-
 
 function canvas1() {
   const canvas = document.querySelector("#page5>canvas");
